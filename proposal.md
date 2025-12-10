@@ -1,5 +1,5 @@
+# CSC172 Data Mining and Analysis Project Proposal
 
-# CSC173 Deep Computer Vision Project Proposal
 **Student:** Gio Kiefer A. Sanchez, 2022-0025
 **Date:** 12/11/2025
 
