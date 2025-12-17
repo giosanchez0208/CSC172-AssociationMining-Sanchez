@@ -6,9 +6,9 @@
 ## 📊 Current Status
 | Milestone | Status | Notes |
 |-----------|--------|-------|
-| Dataset Preparation | ✅ Completed | 9,835 transactions processed |
+| Dataset Preparation | ✅ Completed | 39,774 transactions processed |
 | Data Preprocessing | ✅ Completed | One-hot encoded matrix ready |
-| EDA & Visualization | ✅ In Progress | Item frequencies + basket sizes done |
+| EDA & Visualization | ⏳ Pending | Item frequencies + basket sizes done |
 | Apriori Implementation | ⏳ Pending | Initial run tomorrow |
 | Rule Evaluation | ⏳ Not Started | Planned for next day |
 
