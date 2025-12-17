@@ -8,8 +8,8 @@
 |-----------|--------|-------|
 | Dataset Preparation | ✅ Completed | 39,774 transactions processed |
 | Data Preprocessing | ✅ Completed | One-hot encoded matrix ready |
-| EDA & Visualization | ⏳ Pending | Item frequencies + basket sizes done |
-| Apriori Implementation | ⏳ Pending | Initial run tomorrow |
+| EDA & Visualization | ✅ Completed | Item frequencies + basket sizes done |
+| Apriori Implementation | ⏳ Pending | Planned for next day |
 | Rule Evaluation | ⏳ Not Started | Planned for next day |
 
 
@@ -33,17 +33,29 @@ Transaction 3 (filipino): ['bacon grease', 'buckwheat noodles', 'buttermilk', 'c
 ## 2. EDA Progress
 
 **Key Findings (so far):**
-![Item Frequency Distribution](results/item_frequencies.png)
-- Top 5 items: whole milk(25.3%), other vegetables(19.1%), rolls/buns(17.4%)
-- Average basket size: 2.4 items
-- 68% transactions contain 1-3 items
+
+• Top 5 ingredients:
+  1. sugar (47.6%)
+  2. corn (27.2%)
+  3. yeast (22.1%)
+  4. chicken (20.7%)
+  5. filling (20.1%)
+
+• Average basket size: 10.6 ingredients
+• Median basket size: 10 ingredients
+• 2.0% transactions contain 1-3 ingredients
+• 51.6% transactions contain 4-10 ingredients
+• 46.4% transactions contain >10 ingredients
 
 **Current Metrics:**
-| Metric | Value |
-|--------|-------|
-| Transactions cleaned | 9,708/9,835 (98.7%) |
-| Sparsity reduced | 0.12% → 2.1% |
-| Top item support | whole milk: 0.253 |
+• Total transactions: 39,774
+• Total unique ingredients: 2,229
+• Cuisines analyzed: 20
+• Data sparsity: 99.52%
+• Data density: 0.4758%
+• Top ingredient ('sugar'): appears in 18,943 recipes (0.476 support)
+
+**Distribution Insights:**
 
 ## 3. Challenges Encountered & Solutions
 | Issue | Status | Resolution |
