@@ -145,9 +145,9 @@ transaction_2 = {'cumin', 'chili powder', 'lime', 'onion', 'cuisine:mexican'}
 ## 3. Methodology
 
 <p align="center">
-  <img src="images/ahn_flavor_network.jpg" alt="Flavor Network">
+  <img src="images/cleaning_and_preprocessing_chart.jpg" alt="Data Cleaning and Preprocessing">
   <br>
-  <em>Figure 3: Data Cleaning and Cleaning [4].</em>
+  <em>Figure 3: Data Cleaning and Preprocessing</em>
 </p>
 
 ### 3.1 Data Preprocessing
@@ -217,9 +217,9 @@ Examples: "2 cups all-purpose flour" vs "flour" vs "white flour"
 - Enabled meaningful cross-cuisine pattern comparison
 
 <p align="center">
-  <img src="images/ahn_flavor_network.jpg" alt="Flavor Network">
+  <img src="images/samplinig_before_and_after.png" alt="">
   <br>
-  <em>Figure 4: Class Balances Before and After Stratified Cluster-Based Undersampling [4].</em>
+  <em>Figure 4: Class Balances Before and After Stratified Cluster-Based Undersampling</em>
 </p>
 
 
