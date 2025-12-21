@@ -17,17 +17,32 @@ In the domain of recommender systems and inventory management, understanding the
   - [2.3 Sample Transactions](#23-sample-transactions)
 - [3. Methodology](#3-methodology)
   - [3.1 Data Preprocessing](#31-data-preprocessing)
+    - [3.1.1 Hypergraph to Transaction Format Transformation](#311-hypergraph-to-transaction-format-transformation)
+    - [3.1.2 Ingredient Normalization (LLM-Assisted)](#312-ingredient-normalization-llm-assisted)
+    - [3.1.3 Class Imbalance Analysis](#313-class-imbalance-analysis)
+    - [3.1.4 Stratified Cluster-Based Undersampling](#314-stratified-cluster-based-undersampling)
+    - [3.1.5 Data Quality Validation](#315-data-quality-validation)
   - [3.2 Exploratory Data Analysis](#32-exploratory-data-analysis)
   - [3.3 Apriori Algorithm Implementation](#33-apriori-algorithm-implementation)
+    - [3.3.1 Heterogeneous Item Transformation](#331-heterogeneous-item-transformation)
+    - [3.3.2 Canonical Apriori Implementation](#332-canonical-apriori-implementation)
+    - [3.3.3 Parameter Selection (Tuned via EDA)](#333-parameter-selection-tuned-via-eda)
+    - [3.3.4 Rule Generation](#334-rule-generation)
   - [3.4 Evaluation Metrics](#34-evaluation-metrics)
 - [4. Results](#4-results)
-  - [4.1 Top Association Rules](#41-top-association-rules)
-  - [4.2 Key Visualizations](#42-key-visualizations)
-  - [4.3 Performance Metrics](#43-performance-metrics)
+  - [4.1 Mining Summary Statistics](#41-mining-summary-statistics)
+  - [4.2 Top Association Rules by Category](#42-top-association-rules-by-category)
+    - [4.2.1 Ingredient → Ingredient (Traditional Culinary Patterns)](#421-ingredient--ingredient-traditional-culinary-patterns)
+    - [4.2.2 Ingredients → Cuisine (Classification Rules)](#422-ingredients--cuisine-classification-rules)
+    - [4.2.3 Cuisine → Ingredients (Signature Rules)](#423-cuisine--ingredients-signature-rules)
+  - [4.3 Cross-Cuisine Pattern Analysis](#43-cross-cuisine-pattern-analysis)
+  - [4.4 Interesting Discovered Patterns](#44-interesting-discovered-patterns)
+  - [4.5 Performance Metrics](#45-performance-metrics)
 - [5. Discussion](#5-discussion)
-  - [5.1 Business Insights](#51-business-insights)
-  - [5.2 Actionable Recommendations](#52-actionable-recommendations)
+  - [5.1 Interpretation of Results](#51-interpretation-of-results)
+  - [5.2 Methodological Observations](#52-methodological-observations)
   - [5.3 Limitations](#53-limitations)
+  - [5.4 Implications for Future Research](#54-implications-for-future-research)
 - [6. Conclusion](#6-conclusion)
 - [7. Video Presentation](#7-video-presentation)
 - [References](#references)
@@ -246,7 +261,7 @@ Examples: "2 cups all-purpose flour" vs "flour" vs "white flour"
 <p align="center">
   <img src="images/most_frequent_items.png" alt=" Top 30 Ingredients Bar Chart">
   <br>
-  <em>Figure 3: Top 30 Ingredients Bar Chart.</em>
+  <em>Figure 5: Top 30 Ingredients Bar Chart.</em>
 </p>
 
 **Key Findings:**
@@ -269,7 +284,7 @@ Examples: "2 cups all-purpose flour" vs "flour" vs "white flour"
 <p align="center">
   <img src="images/ingredient_cooccurrence_heatmap.png" alt="Ingredient Co-occurrence Heatmap">
   <br>
-  <em>Figure 3: Ingredient Co-occurrence Heatmap.</em>
+  <em>Figure 6: Ingredient Co-occurrence Heatmap.</em>
 </p>
 
 ### 3.3 Apriori Algorithm Implementation
@@ -376,7 +391,7 @@ Where $\sigma(X)$ = count of transactions containing itemset X, N = total transa
 <p align="center">
   <img src="images/assoc_rules_distribution.png" alt="Association Rules Distribution">
   <br>
-  <em>Figure 3: Association Rules Distribution</em>
+  <em>Figure 7: Association Rules Distribution</em>
 </p>
 
 ### 4.2 Top Association Rules by Category
@@ -402,7 +417,7 @@ Where $\sigma(X)$ = count of transactions containing itemset X, N = total transa
 <p align="center">
   <img src="images/ingredient_ingredient_network.png" alt="Association Rules Distribution">
   <br>
-  <em>Figure 3: Network Graph of Top Ingredient-Ingredient Associations</em>
+  <em>Figure 8: Network Graph of Top Ingredient-Ingredient Associations</em>
 </p>
 
 #### 4.2.2 Ingredients → Cuisine (Classification Rules)
