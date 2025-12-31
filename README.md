@@ -609,8 +609,7 @@ This work establishes a computational foundation for the systematic analysis and
 The project demonstrates that association rule mining, when thoughtfully adapted to address domain-specific challenges like class imbalance and heterogeneous data types, can extract meaningful patterns from complex culinary datasets, bridging the gap between computational methods and cultural preservation.
 
 ## 7. Video Presentation
-[![Final Presentation](demo/CSC172_[LastName]_Final.mp4)](demo/CSC172_[LastName]_Final.mp4)  
-*5-minute demo: Problem → Dataset → Methods → Key Findings → Business Insights*
+https://github.com/user-attachments/assets/d420fab0-cf84-4b3c-b6e6-d5644208be4c
 
 ## References
 
