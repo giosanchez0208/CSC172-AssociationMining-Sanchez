@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="620" viewBox="0 0 1000 620">
+<rect width="100%" height="100%" fill="#ffffff" />
+<style>text{font-family:Arial,sans-serif;font-size:14px;fill:#111827} .small{font-size:12px} .axis{stroke:#111827;stroke-width:1.5} .grid{stroke:#d1d5db;stroke-width:1} .legend{font-size:13px} </style>
+<text x="500.0" y="28" text-anchor="middle" font-size="20" font-weight="700">Cuisine prediction accuracy by basket size</text>
+<line class="grid" x1="80" y1="550.0" x2="960" y2="550.0" />
+<text class="small" x="70" y="554.0" text-anchor="end">0.0</text>
+<line class="grid" x1="80" y1="450.0" x2="960" y2="450.0" />
+<text class="small" x="70" y="454.0" text-anchor="end">0.2</text>
+<line class="grid" x1="80" y1="350.0" x2="960" y2="350.0" />
+<text class="small" x="70" y="354.0" text-anchor="end">0.4</text>
+<line class="grid" x1="80" y1="250.0" x2="960" y2="250.0" />
+<text class="small" x="70" y="254.0" text-anchor="end">0.6</text>
+<line class="grid" x1="80" y1="150.0" x2="960" y2="150.0" />
+<text class="small" x="70" y="154.0" text-anchor="end">0.8</text>
+<line class="grid" x1="80" y1="50.0" x2="960" y2="50.0" />
+<text class="small" x="70" y="54.0" text-anchor="end">1.0</text>
+<line class="grid" x1="80.0" y1="50" x2="80.0" y2="550" />
+<text class="small" x="80.0" y="570" text-anchor="middle">1</text>
+<line class="grid" x1="300.0" y1="50" x2="300.0" y2="550" />
+<text class="small" x="300.0" y="570" text-anchor="middle">2</text>
+<line class="grid" x1="520.0" y1="50" x2="520.0" y2="550" />
+<text class="small" x="520.0" y="570" text-anchor="middle">3</text>
+<line class="grid" x1="740.0" y1="50" x2="740.0" y2="550" />
+<text class="small" x="740.0" y="570" text-anchor="middle">4</text>
+<line class="grid" x1="960.0" y1="50" x2="960.0" y2="550" />
+<text class="small" x="960.0" y="570" text-anchor="middle">5</text>
+<line class="axis" x1="80" y1="50" x2="80" y2="550" />
+<line class="axis" x1="80" y1="550" x2="960" y2="550" />
+<polyline fill="none" stroke="#2563eb" stroke-width="3" points="80.0,489.6 300.0,477.2 520.0,481.8 740.0,475.3 960.0,468.4" />
+<polyline fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="6,4" points="80.0,418.1 300.0,427.5 520.0,406.1 740.0,405.2 960.0,417.3" />
+<rect x="790" y="48" width="14" height="3" fill="#2563eb" />
+<text class="legend" x="810" y="60">signature_weight=0</text>
+<polyline fill="none" stroke="#dc2626" stroke-width="3" points="80.0,509.8 300.0,472.6 520.0,473.3 740.0,483.3 960.0,485.1" />
+<polyline fill="none" stroke="#dc2626" stroke-width="3" stroke-dasharray="6,4" points="80.0,446.6 300.0,422.0 520.0,413.9 740.0,400.0 960.0,405.6" />
+<rect x="790" y="70" width="14" height="3" fill="#dc2626" />
+<text class="legend" x="810" y="82">signature_weight=0.05</text>
+<polyline fill="none" stroke="#16a34a" stroke-width="3" points="80.0,496.4 300.0,460.0 520.0,478.6 740.0,481.0 960.0,475.6" />
+<polyline fill="none" stroke="#16a34a" stroke-width="3" stroke-dasharray="6,4" points="80.0,448.8 300.0,376.7 520.0,393.9 740.0,420.3 960.0,384.7" />
+<rect x="790" y="92" width="14" height="3" fill="#16a34a" />
+<text class="legend" x="810" y="104">signature_weight=0.1</text>
+<polyline fill="none" stroke="#7c3aed" stroke-width="3" points="80.0,455.9 300.0,469.9 520.0,469.1 740.0,463.7 960.0,480.0" />
+<polyline fill="none" stroke="#7c3aed" stroke-width="3" stroke-dasharray="6,4" points="80.0,385.3 300.0,415.4 520.0,388.2 740.0,401.8 960.0,400.0" />
+<rect x="790" y="114" width="14" height="3" fill="#7c3aed" />
+<text class="legend" x="810" y="126">signature_weight=0.25</text>
+<text class="small" x="500.0" y="600" text-anchor="middle">Observed basket size</text>
+<text class="small" transform="translate(24,310.0) rotate(-90)" text-anchor="middle">Accuracy</text>
+</svg>

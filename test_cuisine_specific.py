@@ -2,7 +2,7 @@ import pandas as pd
 from collections import Counter
 
 # Load the data
-df = pd.read_csv('dataset/prepared_recipes_cleaned_balanced.csv')
+df = pd.read_csv('data/processed/prepared_recipes_cleaned_balanced.csv')
 
 print("=" * 80)
 print("CUISINE-SPECIFIC INGREDIENT IDENTIFICATION & PREVALENCE")
