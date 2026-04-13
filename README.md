@@ -28,6 +28,14 @@ The goal here is not to replace a full predictive model. It is to show that a tr
 
 The miner uses `mlxtend`'s FP-Growth implementation. Global ingredient rules use a support threshold of 0.5 percent. Cuisine-local rules use a 1.5 percent per-cuisine support threshold, which is the part that recovers the long-tail culinary signatures that a global threshold was dropping.
 
+## Bottleneck and fix
+
+The first rule-mining setup used a global support threshold that favored ubiquitous ingredients. That pushed the model toward baseline aromatics and seasonings because they appeared across many baskets, while rare cuisine signatures were pruned before confidence or lift could help. The result was mathematically valid but not useful enough for cuisine identification.
+
+PMI fixed that part of the ranking problem by shifting the emphasis from raw frequency to association strength. A rule with high PMI can survive even when its absolute support is low, which is what makes long-tail culinary signatures visible again.
+
+The inference step also needed a coverage fix. Some baskets matched several overlapping rules at once, which inflated the score by counting the same ingredients multiple times. The current demo uses greedy coverage: it sorts matched rules by PMI, keeps the strongest rule first, and only scores later rules if they use ingredients that have not already been consumed by earlier matches.
+
 ## Repository layout
 
 ```text
@@ -67,7 +75,9 @@ The repository includes `src/analyze_strategy_variants.py`, which sweeps basket 
 - `results/analysis/strategy_summary.csv`
 - `results/analysis/basket_size_accuracy.svg`
 
-The sweep showed a consistent tradeoff: coverage rises as the observed basket gets larger, but signature-heavy scoring was not a stable improvement across basket sizes. The explorer therefore ranks cuisines from ingredient -> cuisine rules and uses cuisine -> ingredient rules only as supporting evidence.
+For a readable walkthrough, open `notebooks/methodology_analysis.ipynb`. It loads the mined rules and analysis CSVs and plots the key summaries inline.
+
+The sweep showed a consistent tradeoff: coverage rises as the observed basket gets larger, but signature-heavy scoring was not a stable improvement across basket sizes. The explorer therefore ranks cuisines from forward ingredient -> cuisine rules and sums PMI across the matched rules.
 
 <img src="results/analysis/basket_size_accuracy.svg" alt="Basket size accuracy chart" />
 
@@ -78,8 +88,8 @@ The sweep showed a consistent tradeoff: coverage rises as the observed basket ge
 1. splits a comma-separated ingredient list
 2. normalizes and fuzzy-matches each token against `ingredients.json`
 3. converts matched tokens to canonical ingredient names
-4. scores cuisines from matching ingredient -> cuisine rules and cuisine -> ingredient signature rules
-5. returns the top cuisines with confidence scores, then shows the full ranked tail so low-confidence cuisines still appear
+4. scores cuisines from ingredient -> cuisine rules only, using the summed PMI of matched forward rules
+5. returns the top cuisines with normalized confidence scores, then shows the full ranked tail so low-confidence cuisines still appear
 
 Commands in the interactive explorer:
 
@@ -88,7 +98,14 @@ Commands in the interactive explorer:
 - `clear`
 - `done`, `quit`, or `exit`
 
-The scoring step is data-driven. It uses the mined rule support, confidence, lift, and PMI values, then normalizes the matched evidence across cuisines. It does not rely on hand-built ingredient arrays.
+Run it directly:
+
+```bash
+python demo/cuisine_identifier.py --ingredients "lentil, sugar, garlic"
+python demo/cuisine_identifier.py --interactive
+```
+
+The scoring step is data-driven. It filters to forward cuisine rules, sums PMI across matched antecedents, then normalizes the resulting scores across cuisines. It does not rely on hand-built ingredient arrays.
 
 Example:
 
@@ -102,8 +119,9 @@ Example output:
 Normalized ingredients:
 garlic, lentil, sugar
 Predicted cuisines:
-- indian: 1.000 from 2 matched rule(s)
-  evidence: lentil -> cuisine:indian
+- indian: 99.2% from 2 matched rule(s)
+  PMI score: 7.78
+  - lentil, sugar -> cuisine:indian (PMI: 3.90)
 ```
 
 ## Rebuild the rules

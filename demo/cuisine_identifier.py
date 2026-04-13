@@ -5,7 +5,7 @@ import json
 import re
 from collections import defaultdict
 from difflib import SequenceMatcher
-from math import exp, log1p, sqrt
+from math import exp
 from pathlib import Path
 from typing import Iterable, Sequence
 
@@ -25,10 +25,6 @@ def default_rules_path() -> Path:
 
 def default_ingredients_path() -> Path:
     return project_root() / "data" / "processed" / "ingredients.json"
-
-
-def default_data_path() -> Path:
-    return project_root() / "data" / "processed" / "prepared_recipes_cleaned_balanced.csv"
 
 
 def normalize_text(value: str) -> str:
@@ -159,27 +155,6 @@ def load_rules(path: Path) -> pd.DataFrame:
     return rules
 
 
-def load_cuisine_profile(path: Path) -> dict[str, object]:
-    frame = pd.read_csv(path, usecols=["cuisine", "ingredients"])
-    cuisine_totals: dict[str, int] = defaultdict(int)
-    ingredient_counts: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
-    vocabulary: set[str] = set()
-
-    for row in frame.itertuples(index=False):
-        cuisine = normalize_text(getattr(row, "cuisine"))
-        cuisine_totals[cuisine] += 1
-        items = {normalize_text(part) for part in str(getattr(row, "ingredients")).split(",") if normalize_text(part)}
-        vocabulary.update(items)
-        for item in items:
-            ingredient_counts[cuisine][item] += 1
-
-    return {
-        "cuisine_totals": dict(cuisine_totals),
-        "ingredient_counts": {cuisine: dict(counts) for cuisine, counts in ingredient_counts.items()},
-        "vocabulary_size": len(vocabulary),
-    }
-
-
 def parse_itemset(value: str) -> set[str]:
     return {part.strip().lower() for part in str(value).split(",") if part.strip()}
 
@@ -191,137 +166,59 @@ def extract_cuisine(value: str) -> str:
     return ""
 
 
-def cuisine_signature_rules(cuisine: str, rules: pd.DataFrame, limit: int = 2) -> list[dict[str, object]]:
-    signature_rules = rules[rules["rule_type"] == "cuisine_to_ingredient"].copy()
-    rows: list[dict[str, object]] = []
-
-    for row in signature_rules.itertuples(index=False):
-        if extract_cuisine(getattr(row, "antecedent")) != cuisine:
-            continue
-        rows.append(
-            {
-                "ingredients": sorted(parse_itemset(getattr(row, "consequent"))),
-                "confidence": float(getattr(row, "confidence")),
-                "lift": float(getattr(row, "lift")),
-                "support": float(getattr(row, "support")),
-            }
-        )
-
-    rows.sort(key=lambda item: (item["confidence"] * item["lift"], item["confidence"]), reverse=True)
-    return rows[:limit]
+def is_forward_cuisine_rule(consequent: str) -> bool:
+    items = parse_itemset(consequent)
+    return len(items) == 1 and next(iter(items)).startswith(CUISINE_PREFIX)
 
 
-def signature_evidence(cuisine: str, ingredients: set[str], rules: pd.DataFrame, limit: int = 2) -> list[dict[str, object]]:
-    signature_rules = rules[rules["rule_type"] == "cuisine_to_ingredient"].copy()
-    rows: list[dict[str, object]] = []
+def score_cuisines(ingredients: set[str], rules: pd.DataFrame) -> list[dict[str, object]]:
+    forward_rules = rules[
+        (rules["rule_type"] == "ingredient_to_cuisine")
+        & rules["consequent"].map(is_forward_cuisine_rule)
+    ].copy()
+    if forward_rules.empty:
+        return []
 
-    for row in signature_rules.itertuples(index=False):
-        if extract_cuisine(getattr(row, "antecedent")) != cuisine:
-            continue
-        consequent = parse_itemset(getattr(row, "consequent"))
-        overlap = sorted(consequent & ingredients)
-        if not overlap:
-            continue
-        rows.append(
-            {
-                "ingredients": overlap,
-                "confidence": float(getattr(row, "confidence")),
-                "lift": float(getattr(row, "lift")),
-                "support": float(getattr(row, "support")),
-            }
-        )
-
-    rows.sort(key=lambda item: (item["confidence"] * item["lift"], item["confidence"]), reverse=True)
-    return rows[:limit]
-
-
-def score_cuisines(
-    ingredients: set[str],
-    rules: pd.DataFrame,
-    profile: dict[str, object],
-    top_n: int = 3,
-) -> list[dict[str, object]]:
-    ingredient_rules = rules[rules["rule_type"] == "ingredient_to_cuisine"].copy()
-    cuisine_inventory_weight: dict[str, float] = defaultdict(float)
-    matched_weight: dict[str, float] = defaultdict(float)
+    all_cuisines = sorted(forward_rules["consequent"].map(extract_cuisine).dropna().unique())
+    cuisine_scores: dict[str, float] = defaultdict(float)
     matches_by_cuisine: dict[str, list[dict[str, object]]] = defaultdict(list)
-    cuisine_totals: dict[str, int] = profile["cuisine_totals"]
-    ingredient_counts: dict[str, dict[str, int]] = profile["ingredient_counts"]
-    vocabulary_size: int = profile["vocabulary_size"]
 
-    for row in ingredient_rules.itertuples(index=False):
-        cuisine = extract_cuisine(getattr(row, "consequent"))
-        cuisine_inventory_weight[cuisine] += (
-            float(getattr(row, "support"))
-            * float(getattr(row, "confidence"))
-            * log1p(float(getattr(row, "lift")))
-        )
-
-    for row in ingredient_rules.itertuples(index=False):
+    for row in forward_rules.itertuples(index=False):
         antecedent = parse_itemset(getattr(row, "antecedent"))
         if not antecedent.issubset(ingredients):
             continue
 
         cuisine = extract_cuisine(getattr(row, "consequent"))
-        support = float(getattr(row, "support"))
-        confidence = float(getattr(row, "confidence"))
-        lift = float(getattr(row, "lift"))
-        weight = support * confidence * log1p(lift)
-        matched_weight[cuisine] += weight
+        pmi = float(getattr(row, "pmi"))
+        cuisine_scores[cuisine] += pmi
         matches_by_cuisine[cuisine].append(
             {
                 "antecedent": sorted(antecedent),
                 "consequent": sorted(parse_itemset(getattr(row, "consequent"))),
-                "rule_type": "ingredient_to_cuisine",
-                "confidence": confidence,
-                "lift": lift,
-                "support": support,
-                "weight": weight,
+                "pmi": pmi,
             }
         )
-
-    all_cuisines = sorted(cuisine_totals.keys())
-    profile_scores: dict[str, float] = {}
-    for cuisine in all_cuisines:
-        total = cuisine_totals.get(cuisine, 0)
-        counts = ingredient_counts.get(cuisine, {})
-        score = 0.0
-        for ingredient in ingredients:
-            score += log1p(counts.get(ingredient, 0) + 1) - log1p(total + vocabulary_size)
-        profile_scores[cuisine] = score
-
-    raw_scores: dict[str, float] = {}
-    for cuisine in all_cuisines:
-        weight = matched_weight.get(cuisine, 0.0)
-        inventory = cuisine_inventory_weight.get(cuisine, 0.0)
-        rule_signal = weight / sqrt(inventory) if inventory > 0 else 0.0
-        raw_scores[cuisine] = profile_scores[cuisine] + (1.25 * rule_signal)
-
-    peak = max(raw_scores.values())
-    softmax_scores = {cuisine: exp(score - peak) for cuisine, score in raw_scores.items()}
-    total = sum(softmax_scores.values())
 
     results: list[dict[str, object]] = []
     for cuisine in all_cuisines:
-        matched = matched_weight.get(cuisine, 0.0)
-        best_rule = max(
-            matches_by_cuisine[cuisine],
-            key=lambda item: (item["weight"], item["confidence"], item["lift"]),
-        ) if matches_by_cuisine[cuisine] else None
+        result_score = cuisine_scores.get(cuisine, 0.0)
+        best_rule = max(matches_by_cuisine[cuisine], key=lambda item: item["pmi"]) if matches_by_cuisine[cuisine] else None
         results.append(
             {
                 "cuisine": cuisine,
-                "confidence": softmax_scores[cuisine] / total if total else 0.0,
+                "pmi_score": result_score,
                 "matched_rules": len(matches_by_cuisine[cuisine]),
-                "matched_weight": matched,
-                "profile_score": profile_scores[cuisine],
-                "inventory_weight": cuisine_inventory_weight.get(cuisine, 0.0),
                 "best_rule": best_rule,
-                "signature_rules": cuisine_signature_rules(cuisine, rules, limit=2),
             }
         )
 
-    results.sort(key=lambda item: (item["confidence"], item["matched_weight"]), reverse=True)
+    peak = max((item["pmi_score"] for item in results), default=0.0)
+    exp_scores = [exp(item["pmi_score"] - peak) for item in results]
+    total = sum(exp_scores)
+    for item, exp_score in zip(results, exp_scores, strict=False):
+        item["confidence"] = exp_score / total if total else 0.0
+
+    results.sort(key=lambda item: (item["pmi_score"], item["matched_rules"]), reverse=True)
     return results
 
 
@@ -329,16 +226,13 @@ def predict_cuisine(
     ingredient_text: str,
     rules_path: Path | None = None,
     ingredients_path: Path | None = None,
-    data_path: Path | None = None,
     top_n: int = 3,
 ) -> dict[str, object]:
     rules_path = rules_path or default_rules_path()
     ingredients_path = ingredients_path or default_ingredients_path()
-    data_path = data_path or default_data_path()
 
     normalized_ingredients, resolved, unmatched = normalize_user_ingredients(ingredient_text, ingredients_path)
     rules = load_rules(rules_path)
-    profile = load_cuisine_profile(data_path)
     if not normalized_ingredients:
         return {
             "normalized_ingredients": normalized_ingredients,
@@ -348,12 +242,7 @@ def predict_cuisine(
             "all_predictions": [],
         }
 
-    predictions = score_cuisines(set(normalized_ingredients), rules, profile, top_n=top_n)
-
-    for prediction in predictions:
-        prediction["matched_signature_rules"] = signature_evidence(
-            prediction["cuisine"], set(normalized_ingredients), rules
-        )
+    predictions = score_cuisines(set(normalized_ingredients), rules)
 
     return {
         "normalized_ingredients": normalized_ingredients,
@@ -404,24 +293,11 @@ def print_prediction_block(result: dict[str, object], ingredients_path: Path) ->
         score = prediction["confidence"]
         bar = format_bar(score)
         print(f"\n{cuisine.title()} {bar} {score * 100:.1f}%")
+        print(f"PMI score: {prediction['pmi_score']:.2f}")
 
         best_rule = prediction["best_rule"]
         if best_rule is not None:
-            print(f"Matched rules for {cuisine}:")
-            print(
-                f"- {', '.join(best_rule['antecedent'])} -> {', '.join(best_rule['consequent'])} "
-                f"(conf: {best_rule['confidence']:.2f}, lift: {best_rule['lift']:.2f})"
-            )
-
-        matched_signatures = prediction["matched_signature_rules"]
-        if matched_signatures:
-            print(f"Signature overlap for {cuisine}:")
-            for signature in matched_signatures:
-                print(f"- {', '.join(signature['ingredients'])} (lift: {signature['lift']:.2f})")
-        else:
-            print(f"Typical ingredients for {cuisine}:")
-            for signature in prediction["signature_rules"]:
-                print(f"- {', '.join(signature['ingredients'])} (lift: {signature['lift']:.2f})")
+            print(f"- {', '.join(best_rule['antecedent'])} -> {', '.join(best_rule['consequent'])} (PMI: {best_rule['pmi']:.2f})")
 
     tail = [item for item in all_predictions if item not in predictions]
     if tail:
@@ -459,12 +335,10 @@ def apply_ingredient_line(line: str, selected: list[str], history: list[str], in
 def interactive_session(
     rules_path: Path | None = None,
     ingredients_path: Path | None = None,
-    data_path: Path | None = None,
     top_n: int = 3,
 ) -> None:
     rules_path = rules_path or default_rules_path()
     ingredients_path = ingredients_path or default_ingredients_path()
-    data_path = data_path or default_data_path()
     selected: list[str] = []
     history: list[str] = []
 
@@ -484,7 +358,6 @@ def interactive_session(
             ", ".join(selected),
             rules_path=rules_path,
             ingredients_path=ingredients_path,
-            data_path=data_path,
             top_n=top_n,
         )
         print_prediction_block(result, ingredients_path)
@@ -533,7 +406,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--ingredients", type=str, help="Comma-separated ingredient list")
     parser.add_argument("--rules", type=Path, default=default_rules_path(), help="Association rules CSV")
     parser.add_argument("--ingredient-map", type=Path, default=default_ingredients_path(), help="ingredients.json path")
-    parser.add_argument("--data", type=Path, default=default_data_path(), help="Balanced recipe CSV")
     parser.add_argument("--top-n", type=int, default=3, help="Number of cuisine predictions to show")
     parser.add_argument("--interactive", action="store_true", help="Open the interactive explorer")
     return parser.parse_args()
@@ -542,19 +414,13 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     if args.interactive or not args.ingredients:
-        interactive_session(
-            rules_path=args.rules,
-            ingredients_path=args.ingredient_map,
-            data_path=args.data,
-            top_n=args.top_n,
-        )
+        interactive_session(rules_path=args.rules, ingredients_path=args.ingredient_map, top_n=args.top_n)
         return
 
     result = predict_cuisine(
         ingredient_text=args.ingredients,
         rules_path=args.rules,
         ingredients_path=args.ingredient_map,
-        data_path=args.data,
         top_n=args.top_n,
     )
     print_prediction_block(result, args.ingredient_map)
