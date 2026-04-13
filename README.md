@@ -19,16 +19,14 @@ The goal here is not to replace a full predictive model. It is to show that a tr
 1. Start from `data/processed/prepared_recipes_cleaned_balanced.csv`, which was created after cluster-based stratified undersampling.
 2. Keep the balanced class distribution instead of mining on the original imbalanced set.
 3. Remove `twist` and `filling` before mining. They appear in 2,802 recipes and 2,921 ingredient occurrences, which makes them likely data artifacts rather than meaningful culinary signals.
-4. Mine frequent itemsets with Apriori and export rules with:
-   - support >= 1%
-   - confidence >= 30%
-   - lift >= 1.2
-5. Use the mined rules for three rule families:
+4. Mine ingredient-only rules globally with FP-Growth at a lower support threshold, then mine cuisine-local ingredient signatures inside each cuisine subset.
+5. Filter local cuisine rules with confidence, lift, and PMI so rare but strong culinary signatures survive the first pruning pass.
+6. Use the mined rules for three rule families:
    - ingredient -> ingredient
    - ingredient -> cuisine
    - cuisine -> ingredient
 
-The miner defaults to itemsets up to size 3. At this support threshold, size 5 is usually too sparse to justify the extra candidate churn. It is possible in principle, but it is not the best default for this dataset.
+The miner uses `mlxtend`'s FP-Growth implementation. Global ingredient rules use a support threshold of 0.5 percent. Cuisine-local rules use a 1.5 percent per-cuisine support threshold, which is the part that recovers the long-tail culinary signatures that a global threshold was dropping.
 
 ## Repository layout
 
@@ -49,18 +47,18 @@ The balanced dataset has 9,340 recipes. After filtering artifact ingredients, no
 
 | Metric | Value |
 | --- | ---: |
-| Rules mined | 533 |
-| Ingredient -> ingredient | 468 |
-| Ingredient -> cuisine | 20 |
-| Cuisine -> ingredient | 45 |
+| Rules mined | 14,994 |
+| Ingredient -> ingredient | 2,328 |
+| Ingredient -> cuisine | 12,620 |
+| Cuisine -> ingredient | 46 |
 
 Representative rules from `data/mined/association_rules.csv`:
 
 | Rule | Confidence | Lift |
 | --- | ---: | ---: |
-| `lentil, sugar -> cuisine:indian` | 0.745 | 14.91 |
+| `almond milk, milk -> cuisine:moroccan` | 1.000 | 20.00 |
 | `cuisine:indian -> sugar` | 0.711 | 1.39 |
-| `chocolate, pisco -> sugar` | 0.916 | 1.80 |
+| `crouton, pepper -> sugar` | 0.938 | 1.84 |
 
 ## Analysis
 
@@ -90,7 +88,7 @@ Commands in the interactive explorer:
 - `clear`
 - `done`, `quit`, or `exit`
 
-The scoring step is data-driven. It uses the mined rule support, confidence, and lift values, then normalizes the matched evidence across cuisines. It does not rely on hand-built ingredient arrays.
+The scoring step is data-driven. It uses the mined rule support, confidence, lift, and PMI values, then normalizes the matched evidence across cuisines. It does not rely on hand-built ingredient arrays.
 
 Example:
 

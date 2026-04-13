@@ -26,20 +26,20 @@
 <text class="small" x="960.0" y="570" text-anchor="middle">5</text>
 <line class="axis" x1="80" y1="50" x2="80" y2="550" />
 <line class="axis" x1="80" y1="550" x2="960" y2="550" />
-<polyline fill="none" stroke="#2563eb" stroke-width="3" points="80.0,489.6 300.0,477.2 520.0,481.8 740.0,475.3 960.0,468.4" />
-<polyline fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="6,4" points="80.0,418.1 300.0,427.5 520.0,406.1 740.0,405.2 960.0,417.3" />
+<polyline fill="none" stroke="#2563eb" stroke-width="3" points="80.0,441.5 300.0,403.5 520.0,382.7 740.0,366.9 960.0,356.1" />
+<polyline fill="none" stroke="#2563eb" stroke-width="3" stroke-dasharray="6,4" points="80.0,383.3 300.0,359.3 520.0,323.8 740.0,294.7 960.0,264.3" />
 <rect x="790" y="48" width="14" height="3" fill="#2563eb" />
 <text class="legend" x="810" y="60">signature_weight=0</text>
-<polyline fill="none" stroke="#dc2626" stroke-width="3" points="80.0,509.8 300.0,472.6 520.0,473.3 740.0,483.3 960.0,485.1" />
-<polyline fill="none" stroke="#dc2626" stroke-width="3" stroke-dasharray="6,4" points="80.0,446.6 300.0,422.0 520.0,413.9 740.0,400.0 960.0,405.6" />
+<polyline fill="none" stroke="#dc2626" stroke-width="3" points="80.0,474.8 300.0,411.5 520.0,393.3 740.0,359.5 960.0,372.4" />
+<polyline fill="none" stroke="#dc2626" stroke-width="3" stroke-dasharray="6,4" points="80.0,443.8 300.0,366.9 520.0,314.9 740.0,293.6 960.0,272.4" />
 <rect x="790" y="70" width="14" height="3" fill="#dc2626" />
 <text class="legend" x="810" y="82">signature_weight=0.05</text>
-<polyline fill="none" stroke="#16a34a" stroke-width="3" points="80.0,496.4 300.0,460.0 520.0,478.6 740.0,481.0 960.0,475.6" />
-<polyline fill="none" stroke="#16a34a" stroke-width="3" stroke-dasharray="6,4" points="80.0,448.8 300.0,376.7 520.0,393.9 740.0,420.3 960.0,384.7" />
+<polyline fill="none" stroke="#16a34a" stroke-width="3" points="80.0,414.0 300.0,387.3 520.0,370.5 740.0,382.7 960.0,382.2" />
+<polyline fill="none" stroke="#16a34a" stroke-width="3" stroke-dasharray="6,4" points="80.0,396.5 300.0,322.7 520.0,302.9 740.0,300.0 960.0,291.4" />
 <rect x="790" y="92" width="14" height="3" fill="#16a34a" />
 <text class="legend" x="810" y="104">signature_weight=0.1</text>
-<polyline fill="none" stroke="#7c3aed" stroke-width="3" points="80.0,455.9 300.0,469.9 520.0,469.1 740.0,463.7 960.0,480.0" />
-<polyline fill="none" stroke="#7c3aed" stroke-width="3" stroke-dasharray="6,4" points="80.0,385.3 300.0,415.4 520.0,388.2 740.0,401.8 960.0,400.0" />
+<polyline fill="none" stroke="#7c3aed" stroke-width="3" points="80.0,423.0 300.0,408.8 520.0,395.1 740.0,381.5 960.0,390.2" />
+<polyline fill="none" stroke="#7c3aed" stroke-width="3" stroke-dasharray="6,4" points="80.0,377.9 300.0,362.5 520.0,339.2 740.0,310.9 960.0,292.3" />
 <rect x="790" y="114" width="14" height="3" fill="#7c3aed" />
 <text class="legend" x="810" y="126">signature_weight=0.25</text>
 <text class="small" x="500.0" y="600" text-anchor="middle">Observed basket size</text>
